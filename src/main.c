@@ -15,13 +15,16 @@ volatile int phase = 0;
 
 void initISR(void) {
 	
-	DDRD &= ~(1 << DDD2);     // Clear the PD2 pin
+	// DDRD &= ~(1 << DDD2);     // Clear the PD2 pin
 	// PD2 (PCINT0 pin) is now an input
 
-	PORTD |= (1 << PORTD2);    // turn On the Pull-up
+	DDRD = 1<<PD2;
+	PORTD = 1<<PD2;	
+
+	// PORTD |= (1 << PORTD2);    // turn On the Pull-up
 	// PD2 is now an input with pull-up enabled
 
-	EICRA |= (1 << ISC00);    // set INT0 to trigger on ANY logic change
+	EICRA |= (0 << ISC00);    // set INT0 to trigger on ANY logic change
 	EIMSK |= (1 << INT0);     // Turns on INT0
 
 	sei();                    // turn on interrupts
@@ -29,7 +32,7 @@ void initISR(void) {
 }
 
 ISR(INT0_vect) {
-	phase = 3;
+	PORTB = 0xff;
 }
 
 int main(void)
@@ -41,7 +44,7 @@ int main(void)
 
 
 	initISR();
-	
+
 	while(1) {
 		
 		if (phase == 0) // red lights
@@ -67,7 +70,7 @@ int main(void)
 		}
 
 		phase = (phase + 1) % 4;
-
+		_delay_ms(100);
 		
 	}
 
